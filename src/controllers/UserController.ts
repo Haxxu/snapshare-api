@@ -12,9 +12,14 @@ class UserController {
                 return next(new ApiError(404, 'User not found.'));
             }
 
-            return res
-                .status(200)
-                .json({ data: user, message: 'Get user successfully' });
+            let totalPosts = await UserService.countTotalPostsByUserId(
+                req.params.id
+            );
+
+            return res.status(200).json({
+                data: { user, totalPosts },
+                message: 'Get user successfully',
+            });
         } catch (error) {
             console.log(error);
             return next(new ApiError());
@@ -42,6 +47,36 @@ class UserController {
             return res.status(200).json({
                 data: updated_user,
                 message: 'Update user successfully',
+            });
+        } catch (error) {
+            console.log(error);
+            return next(new ApiError());
+        }
+    }
+
+    async getUserFollowing(req: IReqAuth, res: Response, next: NextFunction) {
+        try {
+            const userService = new UserService(req.params.id);
+            const following = await userService.getFollowing();
+
+            return res.status(200).json({
+                data: following,
+                message: 'Get user following successfully',
+            });
+        } catch (error) {
+            console.log(error);
+            return next(new ApiError());
+        }
+    }
+
+    async getUserFollowers(req: IReqAuth, res: Response, next: NextFunction) {
+        try {
+            const userService = new UserService(req.params.id);
+            const followers = await userService.getFollowers();
+
+            return res.status(200).json({
+                data: followers,
+                message: 'Get user followers successfully',
             });
         } catch (error) {
             console.log(error);

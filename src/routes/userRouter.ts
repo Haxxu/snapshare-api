@@ -11,7 +11,10 @@ router.patch('/users/:id', userAuth, userController.updateUserById);
 // [GET] /api/users/:id => get user by id
 router.get('/users/:id', userAuth, userController.getUserById);
 
-// [GET] /api/users/:id => update user by id
-router.get('/users', () => console.log('hello'));
+// [GET] /api/users/:id/following => get following of user by user id
+router.get('/users/:id/following', userAuth, userController.getUserFollowing);
+
+// [GET] /api/users/:id/followers => get followers of user by user id
+router.get('/users/:id/followers', userAuth, userController.getUserFollowers);
 
 export default router;

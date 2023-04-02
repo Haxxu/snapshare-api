@@ -6,10 +6,22 @@ import meController from '../controllers/MeController';
 
 const router = Router();
 
-// [PATCH] /api/users/:id => update user by id
+// [PUT] /api/me/following => follow user
 router.put('/me/following', userAuth, meController.followUser);
 
-// [GET] /api/users/:id => get user by id
-router.delete('/me/following', userAuth, userController.getUserById);
+// [DELETE] /api/me/following => unfollow user
+router.delete('/me/following', userAuth, meController.unfollowUser);
+
+// [PUT] /api/me/saved-posts => saved post
+router.put('/me/saved-posts', userAuth, meController.savePost);
+
+// [DELETE] /api/me/saved-posts => remove saved post
+router.delete('/me/saved-posts', userAuth, meController.removeSavedPost);
+
+// [PUT] /api/me/liked-posts => like post
+router.put('/me/liked-posts', userAuth, meController.likePost);
+
+// [DELETE] /api/me/liked-posts => remove like post
+router.delete('/me/liked-posts', userAuth, meController.unlikePost);
 
 export default router;

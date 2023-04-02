@@ -9,7 +9,7 @@ import database from './config/database';
 
 console.log('\n\n--------------------------------------');
 
-console.log(new Date());
+// console.log(new Date());
 console.log('\n\n--------------------------------------');
 
 dotenv.config();
