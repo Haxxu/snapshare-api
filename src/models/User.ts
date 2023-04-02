@@ -3,9 +3,11 @@ import Joi from 'joi';
 import passwordComplexity from 'joi-password-complexity';
 import jwt from 'jsonwebtoken';
 
-import { IUser } from '../config/interface';
+import { IUser, IUserMethods } from '../config/interface';
 
-const userSchema = new mongoose.Schema(
+type UserModel = mongoose.Model<IUser, {}, IUserMethods>;
+
+const userSchema = new mongoose.Schema<IUser, UserModel, IUserMethods>(
     {
         name: {
             type: String,
@@ -94,4 +96,4 @@ const validateUser = (user: any) => {
 
 export { validateUser };
 
-export default mongoose.model<IUser>('User', userSchema);
+export default mongoose.model<IUser, UserModel>('User', userSchema);

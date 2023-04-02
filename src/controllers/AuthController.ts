@@ -3,12 +3,12 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
 import ApiError from '../utils/ApiError';
-import { validateUser } from '../models/User';
+import User, { validateUser } from '../models/User';
 import UserService from '../services/UserService';
 import { generateActiveToken } from '../config/generateToken';
 import { validateEmail } from '../utils/validate';
 import sendMail from '../config/sendMail';
-import { IDecodedToken } from '../config/interface';
+import { IDecodedActiveToken, IUser } from '../config/interface';
 
 class AuthController {
     async register(req: Request, res: Response, next: NextFunction) {
@@ -69,7 +69,7 @@ class AuthController {
         try {
             const { active_token } = req.body;
 
-            const decoded = <IDecodedToken>(
+            const decoded = <IDecodedActiveToken>(
                 jwt.verify(active_token, `${process.env.ACTIVE_TOKEN_SECRET}`)
             );
 
@@ -96,6 +96,38 @@ class AuthController {
                 data: { newUser: new_user },
                 message: 'Account have been activated!',
             });
+        } catch (error) {
+            console.log(error);
+            return next(new ApiError());
+        }
+    }
+
+    async login(req: Request, res: Response, next: NextFunction) {
+        try {
+            const user = await User.findOne({
+                account: req.body.account,
+            });
+            if (!user) {
+                return res
+                    .status(400)
+                    .json({ message: 'Invalid account or password' });
+            }
+
+            const validPassword = await bcrypt.compare(
+                req.body.password,
+                user.password
+            );
+            if (!validPassword) {
+                return res
+                    .status(400)
+                    .json({ message: 'Invalid account or password' });
+            }
+
+            const token = user.generateAuthToken();
+
+            return res
+                .status(200)
+                .json({ data: token, message: 'Login sucessfully' });
         } catch (error) {
             console.log(error);
             return next(new ApiError());

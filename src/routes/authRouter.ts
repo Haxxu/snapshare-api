@@ -7,7 +7,10 @@ const router = Router();
 // [POST] /api/auth/register => register user
 router.post('/auth/register', authController.register);
 
-// [POST] /api/auth/active => register user
+// [POST] /api/auth/active => active user
 router.post('/auth/active', authController.activeAccount);
+
+// [POST] /api/auth/login => login user
+router.post('/auth/login', authController.login);
 
 export default router;
