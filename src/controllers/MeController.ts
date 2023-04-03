@@ -4,6 +4,7 @@ import { IReqAuth } from '../config/interface';
 import ApiError from '../utils/ApiError';
 import UserService from '../services/UserService';
 import Post from '../models/Post';
+import Comment from '../models/Comment';
 
 class MeController {
     async followUser(req: IReqAuth, res: Response, next: NextFunction) {
@@ -48,6 +49,37 @@ class MeController {
         }
     }
 
+    async checkSavedPost(req: IReqAuth, res: Response, next: NextFunction) {
+        try {
+            const userService = new UserService(req.user?._id);
+            let liked = await userService.checkSavedPost(
+                req.query.postId as string
+            );
+
+            return res
+                .status(200)
+                .json({ data: liked, message: 'Check saved post' });
+        } catch (error) {
+            console.log(error);
+            return next(new ApiError());
+        }
+    }
+
+    async getSavedPosts(req: IReqAuth, res: Response, next: NextFunction) {
+        try {
+            const userService = new UserService(req.user?._id);
+            const posts = await userService.getSavedPosts();
+
+            return res.status(200).json({
+                data: posts,
+                message: 'Get saved posts successfully.',
+            });
+        } catch (error) {
+            console.log(error);
+            return next(new ApiError());
+        }
+    }
+
     async savePost(req: IReqAuth, res: Response, next: NextFunction) {
         try {
             const post = await Post.findOne({ _id: req.body.post });
@@ -82,6 +114,22 @@ class MeController {
         }
     }
 
+    async checkLikedPost(req: IReqAuth, res: Response, next: NextFunction) {
+        try {
+            const userService = new UserService(req.user?._id);
+            let liked = await userService.checkLikedPost(
+                req.query.postId as string
+            );
+
+            return res
+                .status(200)
+                .json({ data: liked, message: 'Check liked post' });
+        } catch (error) {
+            console.log(error);
+            return next(new ApiError());
+        }
+    }
+
     async likePost(req: IReqAuth, res: Response, next: NextFunction) {
         try {
             const post = await Post.findOne({ _id: req.body.post });
@@ -110,6 +158,58 @@ class MeController {
             return res
                 .status(200)
                 .json({ message: 'Unlike post successfully' });
+        } catch (error) {
+            console.log(error);
+            return next(new ApiError());
+        }
+    }
+
+    async checkLikedComment(req: IReqAuth, res: Response, next: NextFunction) {
+        try {
+            const userService = new UserService(req.user?._id);
+            let liked = await userService.checkLikedComment(
+                req.query.commentId as string
+            );
+
+            return res
+                .status(200)
+                .json({ data: liked, message: 'Check liked comment' });
+        } catch (error) {
+            console.log(error);
+            return next(new ApiError());
+        }
+    }
+
+    async likeComment(req: IReqAuth, res: Response, next: NextFunction) {
+        try {
+            const comment = await Comment.findOne({ _id: req.body.comment });
+            if (!comment)
+                return res.status(404).json({ message: 'Comment not found.' });
+
+            const userService = new UserService(req.user?._id);
+            await userService.likeComment(req.body.comment);
+
+            return res
+                .status(200)
+                .json({ message: 'Like comment successfully' });
+        } catch (error) {
+            console.log(error);
+            return next(new ApiError());
+        }
+    }
+
+    async unlikeComment(req: IReqAuth, res: Response, next: NextFunction) {
+        try {
+            const comment = await Comment.findOne({ _id: req.body.comment });
+            if (!comment)
+                return res.status(404).json({ message: 'Comment not found.' });
+
+            const userService = new UserService(req.user?._id);
+            await userService.unlikeComment(req.body.comment);
+
+            return res
+                .status(200)
+                .json({ message: 'Unlike comment successfully' });
         } catch (error) {
             console.log(error);
             return next(new ApiError());

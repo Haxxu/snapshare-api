@@ -1,3 +1,4 @@
+import Comment from '../models/Comment';
 import Post from '../models/Post';
 import User from '../models/User';
 
@@ -129,9 +130,31 @@ class UserService {
     }
 
     async getPosts() {
-        // Chua xong
         let postsArray = [];
-        const posts = await Post.find({ owner: this.id }).count();
+        const posts = await Post.find({ owner: this.id }).sort({
+            createdAt: -1,
+        });
+        let postsLen = posts.length;
+        for (let i = 0; i < postsLen; ++i) {
+            postsArray.push(posts[i]);
+        }
+
+        return postsArray;
+    }
+
+    async getSavedPosts() {
+        let postsArray = [];
+        const user = await User.findOne({ _id: this.id });
+
+        let savedPostsLeng = user?.saved_posts?.length || 0;
+
+        for (let i = 0; i < savedPostsLeng; ++i) {
+            const post = await Post.findOne({
+                _id: user?.saved_posts[i].post_id,
+            });
+            postsArray.push(post);
+        }
+        return postsArray;
     }
 
     async savePost(postId: string) {
@@ -151,45 +174,91 @@ class UserService {
     }
 
     async removeSavedPost(postId: string) {
-        const user = await User.findOne({ _id: this.id });
-
-        let index = user?.saved_posts
-            .map((item) => item.post_id)
-            .indexOf(postId);
-        if (index !== -1) {
-            user?.saved_posts.splice(index || -1, 1);
-        }
-
-        await user?.save();
+        await User.updateOne(
+            { _id: this.id },
+            { $pull: { saved_posts: { post_id: postId } } }
+        );
     }
 
     async likePost(postId: string) {
         const user = await User.findOne({ _id: this.id });
+        const post = await Post.findOne({ _id: postId });
 
         let index = user?.liked_posts
             .map((item) => item.post_id)
             .indexOf(postId);
         if (index === -1) {
+            let added_at = Date.now();
             user?.liked_posts.unshift({
                 post_id: postId,
-                added_at: Date.now(),
+                added_at,
+            });
+            post?.likes.unshift({
+                user: this.id,
+                added_at,
             });
         }
 
         await user?.save();
+        await post?.save();
     }
 
     async unlikePost(postId: string) {
-        const user = await User.findOne({ _id: this.id });
+        await User.updateOne(
+            { _id: this.id },
+            { $pull: { liked_posts: { post_id: postId } } }
+        );
+        await Post.updateOne(
+            { _id: postId },
+            { $pull: { likes: { user: this.id } } }
+        );
+    }
 
+    async likeComment(commentId: string) {
+        const comment = await Comment.findOne({ _id: commentId });
+
+        let index = comment?.likes
+            .map((item) => item.user.toString())
+            .indexOf(this.id);
+        if (index === -1) {
+            comment?.likes.unshift({
+                user: this.id,
+                added_at: Date.now(),
+            });
+        }
+
+        await comment?.save();
+    }
+
+    async unlikeComment(commentId: string) {
+        await Comment.updateOne(
+            { _id: commentId },
+            { $pull: { likes: { user: this.id } } }
+        );
+    }
+
+    async checkLikedPost(postId: string) {
+        const user = await User.findOne({ _id: this.id });
         let index = user?.liked_posts
             .map((item) => item.post_id)
             .indexOf(postId);
-        if (index !== -1) {
-            user?.liked_posts.splice(index || -1, 1);
-        }
+        return index !== -1;
+    }
 
-        await user?.save();
+    async checkLikedComment(commentId: string) {
+        const comment = await Comment.findOne({ _id: commentId });
+        let index = comment?.likes
+            .map((item) => item.user.toString())
+            .indexOf(this.id);
+        return index !== -1;
+    }
+
+    async checkSavedPost(postId: string) {
+        const user = await User.findOne({ _id: this.id });
+        let index = user?.saved_posts
+            .map((item) => item.post_id)
+            .indexOf(postId);
+        return index !== -1;
     }
 }
 

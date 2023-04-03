@@ -8,6 +8,9 @@ const router = Router();
 // [PATCH] /api/users/:id => update user by id
 router.patch('/users/:id', userAuth, userController.updateUserById);
 
+// [GET] /api/users/:id/posts => get posts by user id
+router.get('/users/:id/posts', userAuth, userController.getPostsByUserId);
+
 // [GET] /api/users/:id => get user by id
 router.get('/users/:id', userAuth, userController.getUserById);
 

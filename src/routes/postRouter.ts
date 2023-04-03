@@ -5,6 +5,9 @@ import postController from '../controllers/PostController';
 
 const router = Router();
 
+// [GET] /api/posts/:id/comments => get comment by post id
+router.get('/posts/:id/comments', userAuth, postController.getCommentsByPostId);
+
 // [PATCH] /api/posts/:id => update post by id
 router.patch('/posts/:id', userAuth, postController.updatePostById);
 

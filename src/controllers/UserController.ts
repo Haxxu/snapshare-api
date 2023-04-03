@@ -83,6 +83,24 @@ class UserController {
             return next(new ApiError());
         }
     }
+
+    async getPostsByUserId(req: IReqAuth, res: Response, next: NextFunction) {
+        try {
+            const user = await UserService.findOne({ _id: req.params.id });
+            if (!user) {
+                return res.status(404).json({ message: 'User not found.' });
+            }
+            const userService = new UserService(req.params.id);
+            const posts = await userService.getPosts();
+
+            return res
+                .status(200)
+                .json({ data: posts, message: 'Get posts successfully.' });
+        } catch (error) {
+            console.log(error);
+            return next(new ApiError());
+        }
+    }
 }
 
 export default new UserController();

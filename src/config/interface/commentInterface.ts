@@ -2,11 +2,10 @@ import { Document } from 'mongoose';
 
 import { ILike } from '.';
 
-export interface IPost extends Document {
+export interface IComment extends Document {
     owner: string;
-    title: string;
-    description: string;
-    image: string;
+    post: string;
+    content: string;
     likes: ILike[];
     _doc: object;
 }

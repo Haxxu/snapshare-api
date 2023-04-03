@@ -1,3 +1,4 @@
+import Comment from '../models/Comment';
 import Post from '../models/Post';
 import User from '../models/User';
 
@@ -29,7 +30,7 @@ class PostService {
     static async deletePostById(id: string) {
         await User.updateMany({}, { $pull: { saved_posts: { post_id: id } } });
         await User.updateMany({}, { $pull: { liked_posts: { post_id: id } } });
-        // delete comment
+        await Comment.deleteMany({ post: id });
         await Post.findOneAndRemove({ _id: id });
     }
 

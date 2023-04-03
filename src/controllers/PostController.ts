@@ -3,6 +3,7 @@ import { IReqAuth } from '../config/interface';
 import ApiError from '../utils/ApiError';
 import Post, { validatePost } from '../models/Post';
 import PostService from '../services/PostService';
+import CommentService from '../services/CommentService';
 
 class PostController {
     async createPost(req: IReqAuth, res: Response, next: NextFunction) {
@@ -78,6 +79,32 @@ class PostController {
             return res
                 .status(200)
                 .json({ message: 'Delete post successfully' });
+        } catch (error) {
+            console.log(error);
+            return next(new ApiError());
+        }
+    }
+
+    async getCommentsByPostId(
+        req: IReqAuth,
+        res: Response,
+        next: NextFunction
+    ) {
+        try {
+            const post = await Post.findOne({ _id: req.params.id });
+            if (!post) {
+                return res.status(404).json({ message: 'Post not found.' });
+            }
+
+            const comments = await CommentService.getCommentsByPostId(
+                req.params.id
+            );
+            return res
+                .status(200)
+                .json({
+                    data: comments,
+                    message: 'Get comments of post successfully',
+                });
         } catch (error) {
             console.log(error);
             return next(new ApiError());
