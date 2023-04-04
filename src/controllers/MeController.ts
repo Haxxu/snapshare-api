@@ -215,6 +215,22 @@ class MeController {
             return next(new ApiError());
         }
     }
+
+    async getUserInfo(req: IReqAuth, res: Response, next: NextFunction) {
+        try {
+            const userService = new UserService(req.user?._id);
+            const user = await userService.getInfo();
+            if (!user) {
+                return res.status(404).json({ message: 'User not found' });
+            }
+            return res
+                .status(200)
+                .json({ data: user, message: 'Get user info successfully.' });
+        } catch (error) {
+            console.log(error);
+            return next(new ApiError());
+        }
+    }
 }
 
 export default new MeController();

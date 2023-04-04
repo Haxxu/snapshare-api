@@ -17,4 +17,7 @@ router.delete('/posts/:id', userAuth, postController.deletePostById);
 // [POST] /api/posts/ => create post
 router.post('/posts', userAuth, postController.createPost);
 
+// [GET] /api/posts => get post by tags
+router.get('/posts', userAuth, postController.getPostsByTags);
+
 export default router;

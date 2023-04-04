@@ -46,4 +46,7 @@ router.put('/me/liked-comments', userAuth, meController.likeComment);
 // [DELETE] /api/me/liked-comments => unlike comment
 router.delete('/me/liked-comments', userAuth, meController.unlikeComment);
 
+// [GET] /api/me
+router.get('/me/info', userAuth, meController.getUserInfo);
+
 export default router;

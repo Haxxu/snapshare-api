@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import Comment from '../models/Comment';
 import Post from '../models/Post';
 import User from '../models/User';
@@ -259,6 +260,36 @@ class UserService {
             .map((item) => item.post_id)
             .indexOf(postId);
         return index !== -1;
+    }
+
+    async getInfo() {
+        const user = await User.findOne({ _id: this.id }).select(
+            '-password -__v'
+        );
+        return user;
+    }
+
+    async getFollowingUsersPosts(limit: string) {
+        const user = await User.findOne({ _id: this.id });
+        const userIds = user?.following.map(
+            (item) => new mongoose.Types.ObjectId(item.user_id)
+        );
+        const result = await Post.aggregate([
+            {
+                $match: { owner: { $in: userIds } },
+            },
+            { $sort: { createdAt: -1 } },
+            {
+                $limit: parseInt(limit) || 8,
+            },
+        ]);
+
+        const posts = await Post.populate(result, {
+            path: 'owner',
+            select: '-password -__v -saved_posts -liked_posts -role',
+        });
+
+        return posts;
     }
 }
 

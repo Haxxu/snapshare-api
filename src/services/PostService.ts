@@ -41,6 +41,32 @@ class PostService {
             { new: true }
         );
     }
+
+    static async getPostsByTags(tags: string[], limit: string) {
+        interface IType {
+            random?: any[];
+        }
+        const object: IType = {};
+        if (tags.includes('random')) {
+            const result = await Post.aggregate([
+                {
+                    $sample: { size: parseInt(limit) || 8 },
+                },
+                { $sort: { createdAt: -1 } },
+                {
+                    $limit: parseInt(limit) || 8,
+                },
+            ]);
+            const posts = await Post.populate(result, {
+                path: 'owner',
+                select: '-password -__v -saved_posts -liked_posts -role',
+            });
+
+            object.random = [...posts];
+        }
+
+        return object;
+    }
 }
 
 export default PostService;
