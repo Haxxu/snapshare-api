@@ -50,12 +50,16 @@ class AuthController {
                     .status(200)
                     .json({ message: 'Sucess! Please check your email.' });
             } else {
-                const new_user = await UserService.createNewUser(newUser);
+                const { new_user, token } = await UserService.createNewUser(
+                    newUser
+                );
 
                 return res.status(200).json({
                     data: {
                         newUser: new_user,
+                        token,
                     },
+                    token,
                     message: 'Account created successfully!',
                 });
             }
@@ -90,10 +94,13 @@ class AuthController {
                 );
             }
 
-            const new_user = await UserService.createNewUser(newUser);
+            const { new_user, token } = await UserService.createNewUser(
+                newUser
+            );
 
             return res.status(200).json({
-                data: { newUser: new_user },
+                data: { newUser: new_user, token },
+                token,
                 message: 'Account have been activated!',
             });
         } catch (error) {
@@ -104,6 +111,8 @@ class AuthController {
 
     async login(req: Request, res: Response, next: NextFunction) {
         try {
+            console.log(req.body);
+
             const user = await User.findOne({
                 account: req.body.account,
             });
@@ -127,7 +136,7 @@ class AuthController {
 
             return res
                 .status(200)
-                .json({ data: token, message: 'Login sucessfully' });
+                .json({ data: token, token, message: 'Login sucessfully' });
         } catch (error) {
             console.log(error);
             return next(new ApiError());

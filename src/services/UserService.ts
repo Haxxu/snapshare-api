@@ -24,8 +24,8 @@ class UserService {
 
         newUser.password = '';
         newUser.__v = undefined;
-
-        return newUser;
+        const token = newUser.generateAuthToken();
+        return { new_user: newUser, token };
     }
 
     static async getUserByIdPublic(id: string) {
