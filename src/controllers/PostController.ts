@@ -99,12 +99,26 @@ class PostController {
             const comments = await CommentService.getCommentsByPostId(
                 req.params.id
             );
-            return res
-                .status(200)
-                .json({
-                    data: comments,
-                    message: 'Get comments of post successfully',
-                });
+            return res.status(200).json({
+                data: comments,
+                message: 'Get comments of post successfully',
+            });
+        } catch (error) {
+            console.log(error);
+            return next(new ApiError());
+        }
+    }
+
+    async getPostsByTags(req: IReqAuth, res: Response, next: NextFunction) {
+        try {
+            const tags = req.query.tags as string[];
+            const limit = req.query.limit as string;
+
+            const posts = await PostService.getPostsByTags(tags, limit);
+            return res.status(200).json({
+                data: posts,
+                message: 'Get post by tags successfully',
+            });
         } catch (error) {
             console.log(error);
             return next(new ApiError());

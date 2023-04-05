@@ -14,6 +14,13 @@ router.get('/users/:id/posts', userAuth, userController.getPostsByUserId);
 // [GET] /api/users/:id => get user by id
 router.get('/users/:id', userAuth, userController.getUserById);
 
+// [GET] /api/users/:id/following/posts => get posts of following user by user id
+router.get(
+    '/users/:id/following/posts',
+    userAuth,
+    userController.getFollowingUsersPosts
+);
+
 // [GET] /api/users/:id/following => get following of user by user id
 router.get('/users/:id/following', userAuth, userController.getUserFollowing);
 

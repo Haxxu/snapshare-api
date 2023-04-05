@@ -54,6 +54,26 @@ class UserController {
         }
     }
 
+    async getFollowingUsersPosts(
+        req: IReqAuth,
+        res: Response,
+        next: NextFunction
+    ) {
+        try {
+            const userService = new UserService(req.user?._id);
+            const posts = await userService.getFollowingUsersPosts(
+                req.query.limit as string
+            );
+            return res.status(200).json({
+                data: posts,
+                message: 'Get following users posts successfully',
+            });
+        } catch (error) {
+            console.log(error);
+            return next(new ApiError());
+        }
+    }
+
     async getUserFollowing(req: IReqAuth, res: Response, next: NextFunction) {
         try {
             const userService = new UserService(req.params.id);
