@@ -111,7 +111,7 @@ class AuthController {
 
     async login(req: Request, res: Response, next: NextFunction) {
         try {
-            console.log(req.body);
+            // console.log(req.body);
 
             const user = await User.findOne({
                 account: req.body.account,
