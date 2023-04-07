@@ -288,12 +288,12 @@ class UserService {
             },
         ]);
 
-        const posts = await Post.populate(result, {
-            path: 'owner',
-            select: '-password -__v -saved_posts -liked_posts -role',
-        });
+        // const posts = await Post.populate(result, {
+        //     path: 'owner',
+        //     select: '-password -__v -saved_posts -liked_posts -role',
+        // });
 
-        return posts;
+        return result;
     }
 }
 
