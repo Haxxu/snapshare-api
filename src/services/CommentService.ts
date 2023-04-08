@@ -24,13 +24,14 @@ class CommentService {
 
     static async getCommentsByPostId(postId: string) {
         const comments = await Comment.find({ post: postId })
-            .select('-__v')
-            .populate([
-                {
-                    path: 'owner',
-                    select: '-password -__v -role -saved_posts -liked_posts',
-                },
-            ]);
+            .sort({ createdAt: 'desc' })
+            .select('-__v');
+        // .populate([
+        //     {
+        //         path: 'owner',
+        //         select: '-password -__v -role -saved_posts -liked_posts',
+        //     },
+        // ]);
 
         return comments;
     }
