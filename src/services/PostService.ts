@@ -67,6 +67,10 @@ class PostService {
 
         return object;
     }
+
+    static async searchPost(condition: object) {
+        return await Post.find(condition).select('-__v');
+    }
 }
 
 export default PostService;

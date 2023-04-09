@@ -6,6 +6,9 @@ import meController from '../controllers/MeController';
 
 const router = Router();
 
+// [GET] /api/me/following/contains => check following user
+router.get('/me/following/contains', userAuth, meController.checkFollowUser);
+
 // [PUT] /api/me/following => follow user
 router.put('/me/following', userAuth, meController.followUser);
 

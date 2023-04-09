@@ -59,8 +59,14 @@ class UserService {
                 user_id: follow_user_id,
                 added_at: Date.now(),
             });
+        }
+
+        let index2 = follow_user?.followers
+            .map((item) => item.user_id)
+            .indexOf(this.id);
+        if (index2 === -1) {
             follow_user?.followers.push({
-                user_id: user?._id,
+                user_id: this.id,
                 added_at: Date.now(),
             });
         }
@@ -76,14 +82,15 @@ class UserService {
         let indexInFollowing = user?.following
             .map((item) => item.user_id)
             .indexOf(unfollow_user_id);
-
         if (indexInFollowing !== -1) {
-            user?.following.splice(indexInFollowing || -1, 1);
+            user?.following.splice(indexInFollowing as number, 1);
+        }
 
-            let indexInFollowers = unfollow_user?.followers
-                .map((item) => item.user_id)
-                .indexOf(user?._id);
-            unfollow_user?.followers.splice(indexInFollowers || -1, 1);
+        let indexInFollowers = unfollow_user?.followers
+            .map((item) => item.user_id)
+            .indexOf(this.id);
+        if (indexInFollowers !== -1) {
+            unfollow_user?.followers.splice(indexInFollowers as number, 1);
         }
 
         await user?.save();
@@ -265,6 +272,18 @@ class UserService {
             .indexOf(postId);
         return index !== -1;
     }
+    async checkFollowUser(userId: string) {
+        const user = await User.findOne({ _id: userId });
+        let index = user?.followers
+            .map((item) => item.user_id)
+            .indexOf(this.id);
+
+        const user1 = await User.findOne({ _id: this.id });
+        let index1 = user1?.following
+            .map((item) => item.user_id)
+            .indexOf(userId);
+        return index !== -1 || index1 !== -1;
+    }
 
     async getInfo() {
         const user = await User.findOne({ _id: this.id }).select(
@@ -294,6 +313,17 @@ class UserService {
         // });
 
         return result;
+    }
+
+    static async searchUser({ search = '', limit = 10 }) {
+        return await User.find({
+            $or: [
+                { name: { $regex: search, $options: 'i' } },
+                { account: { $regex: search, $options: 'i' } },
+            ],
+        })
+            .select('-password -__v -saved_posts -liked_posts -role')
+            .limit(limit);
     }
 }
 

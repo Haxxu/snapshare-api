@@ -7,6 +7,22 @@ import Post from '../models/Post';
 import Comment from '../models/Comment';
 
 class MeController {
+    async checkFollowUser(req: IReqAuth, res: Response, next: NextFunction) {
+        try {
+            const userService = new UserService(req.user?._id);
+            let liked = await userService.checkFollowUser(
+                req.query.userId as string
+            );
+
+            return res
+                .status(200)
+                .json({ data: liked, message: 'Check follow user' });
+        } catch (error) {
+            console.log(error);
+            return next(new ApiError());
+        }
+    }
+
     async followUser(req: IReqAuth, res: Response, next: NextFunction) {
         try {
             const follow_user = await UserService.findOne({
